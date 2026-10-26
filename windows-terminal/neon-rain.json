@@ -1,0 +1,28 @@
+{
+  "$help": "Windows Terminal fragment: adds the Neon Rain color scheme. Select it under Settings > Profiles > Defaults > Appearance.",
+  "schemes": [
+    {
+      "name": "Neon Rain",
+      "background": "#13111F",
+      "foreground": "#C0CAF5",
+      "cursorColor": "#FF79C6",
+      "selectionBackground": "#2F2552",
+      "black": "#15161E",
+      "red": "#F7768E",
+      "green": "#73DACA",
+      "yellow": "#E0AF68",
+      "blue": "#7AA2F7",
+      "purple": "#BB9AF7",
+      "cyan": "#7DCFFF",
+      "white": "#A9B1D6",
+      "brightBlack": "#565F89",
+      "brightRed": "#FF007C",
+      "brightGreen": "#9ECE6A",
+      "brightYellow": "#FF9E64",
+      "brightBlue": "#89DDFF",
+      "brightPurple": "#FF79C6",
+      "brightCyan": "#B4F9F8",
+      "brightWhite": "#C0CAF5"
+    }
+  ]
+}
