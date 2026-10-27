@@ -31,6 +31,10 @@ With an approved plan, the top bar tracks the plan's steps instead:
 - **Title.** The card title is the pane's name if you've renamed it (prefix + Shift + P), otherwise Claude's session title.
 - **Still means idle.** When nothing is running, everything freezes and turns gray, so anything that moves is working.
 - **Spaces panel.** Each space gets the same animated rollup.
+- **Subagent windows.** When Claude starts a subagent, a pane opens in a `⑂ subagents` tab next to it:
+  - It shows each step live (`⚒ Read src/app.js`), the agent's messages and its final report, and gets its own sidebar card.
+  - Right-click it for a menu: copy the report or whole log, open the transcript, show details, jump to the parent agent, keep the window, or close windows.
+  - When new subagents start, finished windows close. Running windows and ones you chose to keep stay open, and at most 4 are open at once.
 - **Tab bar.** It reads `⚡ NC-2077 ▸ 夜の街 ░ hostname ░ time`.
 - **Windows Terminal.** An optional matching "Neon Rain" color scheme.
 
@@ -61,6 +65,19 @@ cd herdr-nightcity
 ./install.sh
 ```
 
+### Subagent windows (optional)
+
+Add two hooks to `~/.claude/settings.json` so Claude Code tells herdr about subagents. Merge them with any hooks you already have, and use your own herdr config path (`~/.config/herdr` on macOS and Linux):
+
+```json
+"hooks": {
+  "SubagentStart": [{ "hooks": [{ "type": "command", "command": "node \"C:/Users/<you>/AppData/Roaming/herdr/fx/subagents.js\" start", "async": true }] }],
+  "SubagentStop":  [{ "hooks": [{ "type": "command", "command": "node \"C:/Users/<you>/AppData/Roaming/herdr/fx/subagents.js\" stop", "async": true }] }]
+}
+```
+
+The hooks do nothing outside herdr. Copying to the clipboard and opening the transcript from the menu work on Windows only.
+
 After a reboot, start the animator again with:
 - **Windows:** double-click `%APPDATA%\herdr\fx\start-sidebar-fx.vbs`, or install with `-Autostart`.
 - **macOS / Linux:** run `node ~/.config/herdr/fx/sidebar-fx.js &`.
@@ -77,6 +94,11 @@ herdr can't animate anything by itself, but it does let a script fill in values 
 - **`fx/plan.js`** finds the plan's steps and tracks progress:
   - Claude doesn't record which steps are done, so progress comes from what it says ("Phase 2 is done", "starting step 3").
   - If the plan file uses `- [x]` checkboxes, those are counted instead, and they're exact.
+- **`fx/subagents.js`** is the Claude Code hook. It keeps one tab per parent session and one pane per subagent, and records them in `<herdr config>/subagents/<session>.json`.
+- **`fx/subagent-view.js`** runs in each of those panes:
+  - It follows the subagent's transcript (`~/.claude/projects/**/<session>/subagents/agent-<id>.jsonl`).
+  - It strips escape sequences and control characters before drawing, because transcripts hold tool output and file contents.
+  - The pane receives right-clicks (`pane input --right-click pane`), so the viewer draws its own menu. Right-click the pane's border for herdr's usual menu.
 
 ## Customize
 
@@ -99,8 +121,9 @@ After changing anything, run the installer again. Or rebuild by hand with `node 
 2. Stop the animator:
    - Windows: end the `node.exe` process whose command line includes `sidebar-fx`.
    - macOS / Linux: `pkill -f sidebar-fx.js`.
-3. Delete the `fx` folder in your herdr config directory.
-4. On Windows, also delete:
+3. Remove the `SubagentStart` and `SubagentStop` hooks from `~/.claude/settings.json`, if you added them.
+4. Delete the `fx` and `subagents` folders in your herdr config directory.
+5. On Windows, also delete:
    - the Startup shortcut `herdr sidebar-fx.lnk`, if you used `-Autostart`
    - `%LOCALAPPDATA%\Microsoft\Windows Terminal\Fragments\herdr-nightcity`
 
