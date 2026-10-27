@@ -24,6 +24,7 @@ const CLAUDE_PROJECTS = path.join(os.homedir(), '.claude', 'projects');
 // Frame strings live in frames.js; the config generator builds color rules from the same data.
 const { SPIN, GLITCH, FIRST_ROW_WIDTH, charge, planBar } = require('./frames');
 const { PlanTracker } = require('./plan');
+const activity = require('./activity');
 // Claude's context window in tokens; the charge bar is full at this size.
 const CONTEXT_LIMIT = Number(process.env.SIDEBAR_FX_CONTEXT_LIMIT) || 1000000;
 const PULSE = ['◉', '○'];
@@ -63,6 +64,7 @@ function poll() {
   send('agent.list', {}, (msg) => {
     agents = (msg.result && msg.result.agents) || [];
     for (const a of agents) claudeSession(a); // keep activity fresh
+    if (msg.result) activity.track(agents, (a) => ({ ...statsTokens(a), status: effectiveStatus(a) }));
     log(`${agents.length} agent(s)`);
   });
 }
@@ -150,6 +152,8 @@ function readSession(sessionId) {
     s = { file: findTranscript(sessionId), offset: 0, rest: '', start: null, model: null, ctx: 0, turns: 0, tools: 0, out: new Map(), aiTitle: null, plan: new PlanTracker() };
     sessions.set(sessionId, s);
   }
+  // Claude writes the transcript after the session is reported, so keep looking.
+  if (!s.file) s.file = findTranscript(sessionId);
   if (!s.file) return s;
   let size;
   try { size = fs.statSync(s.file).size; } catch { return s; }
@@ -238,6 +242,7 @@ function log(msg) {
   if (process.env.SIDEBAR_FX_DEBUG) console.log(`[sidebar-fx] ${msg}`);
 }
 
+activity.trim();
 poll();
 setInterval(poll, POLL_MS);
 setInterval(stats, STATS_MS);

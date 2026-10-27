@@ -29,6 +29,10 @@ const chargeRules = [
   `{ contains = "${PLAN_COMPLETE}", fg = "#73DACA", bold = true }`,
 ].join(', ');
 const chargeBar = `{ token = "$charge", fg = "${IDLE}", rules = [ ${chargeRules} ] }`;
+// Popup commands run through cmd.exe on Windows and sh elsewhere.
+const RECAP_COMMAND = process.platform === 'win32'
+  ? 'node "%APPDATA%\\herdr\\fx\\recap.js" --popup'
+  : 'node "$HOME/.config/herdr/fx/recap.js" --popup';
 
 const config = `onboarding = false
 
@@ -99,6 +103,19 @@ delivery = "herdr"
 
 [ui.sound]
 enabled = false
+
+[keys]
+focus_agent = "alt+1..9"
+next_agent = "prefix+a"
+previous_agent = "prefix+shift+a"
+
+# Agent recap: live state, 24h timeline and runs (fx/recap.js).
+[[keys.command]]
+key = "prefix+t"
+type = "popup"
+command = '${RECAP_COMMAND}'
+width = "90%"
+height = "85%"
 `;
 
 fs.writeFileSync(process.argv[2], config);
