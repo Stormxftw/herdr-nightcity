@@ -3,7 +3,7 @@
   Installs herdr-nightcity: the neon theme, animated sidebar and Windows Terminal scheme.
 
 .DESCRIPTION
-  1. Copies fx/ to %APPDATA%\herdr\fx
+  1. Copies fx/ to %APPDATA%\herdr\fx and links the equalize panes plugin
   2. Backs up your herdr config.toml, then writes the generated one
   3. Adds the Neon Rain scheme to Windows Terminal (as a fragment; your settings.json is untouched)
   4. Reloads herdr and starts the sidebar animator in the background
@@ -29,8 +29,13 @@ $fxDir = Join-Path $herdrDir 'fx'
 $config = Join-Path $herdrDir 'config.toml'
 New-Item -ItemType Directory -Force $fxDir | Out-Null
 
-Copy-Item (Join-Path $PSScriptRoot 'fx\*') $fxDir -Force
+Copy-Item (Join-Path $PSScriptRoot 'fx\*') $fxDir -Recurse -Force
 Write-Host "Copied animator to $fxDir"
+
+if (Get-Command herdr -ErrorAction SilentlyContinue) {
+  herdr plugin link (Join-Path $fxDir 'equalize') | Out-Null
+  Write-Host 'Linked the equalize panes plugin'
+}
 
 if (Test-Path $config) {
   $backup = "$config.bak-$(Get-Date -Format yyyyMMdd-HHmmss)"

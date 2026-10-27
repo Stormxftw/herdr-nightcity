@@ -1,0 +1,9 @@
+{
+  "repos": [
+    { "name": "my-app", "path": "C:/code/my-app" }
+  ],
+  "services": [
+    { "name": "ollama", "port": 11434 },
+    { "name": "hermes", "hermes": true }
+  ]
+}
