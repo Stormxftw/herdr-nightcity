@@ -1,0 +1,20 @@
+id = "joe.equalize"
+name = "Equalize panes"
+version = "0.1.0"
+min_herdr_version = "0.9.5"
+description = "Make every pane in the focused tab the same size"
+platforms = ["linux", "macos", "windows"]
+
+# Rearrange into a balanced grid sized to the pane count.
+[[actions]]
+id = "grid"
+title = "Equalize panes (grid)"
+contexts = ["workspace"]
+command = ["node", "equalize.js", "grid"]
+
+# Keep the current arrangement, even out every row and column.
+[[actions]]
+id = "even"
+title = "Equalize panes (keep arrangement)"
+contexts = ["workspace"]
+command = ["node", "equalize.js"]

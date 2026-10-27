@@ -12,8 +12,12 @@ config="${HERDR_CONFIG_PATH:-$herdr_dir/config.toml}"
 fx_dir="$herdr_dir/fx"
 
 mkdir -p "$fx_dir"
-cp "$here"/fx/*.js "$fx_dir"/
+cp -R "$here"/fx/. "$fx_dir"/
 echo "Copied animator to $fx_dir"
+
+if command -v herdr >/dev/null 2>&1; then
+  herdr plugin link "$fx_dir/equalize" >/dev/null && echo "Linked the equalize panes plugin"
+fi
 
 if [ -f "$config" ]; then
   backup="$config.bak-$(date +%Y%m%d-%H%M%S)"
